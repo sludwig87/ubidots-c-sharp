@@ -149,15 +149,20 @@ namespace Ubidots
             }
         }
 
+        public string Post(string Path, string Json)
+        {
+            return PostResp(Path, Json, out _);
+        }
         /// <summary>
         /// Send a POST request to Ubidots using the Token
         /// </summary>
         /// <param name="Path" />  The path were we're going to query in Ubidots API
         /// <param name="Json" /> The json we're going to send to the server
         /// <returns>A string containing the response of the server</returns>
-        public string Post(string Path, string Json)
+        public string PostResp(string Path, string Json, out HttpStatusCode respStatusCode)
         {
             string Response = null;
+            respStatusCode = 0;
             WebHeaderCollection Headers = PrepareHeaders(TokenHeader);
 
             string Url = BaseUrl + Path;
@@ -177,12 +182,14 @@ namespace Ubidots
 
                 using (HttpWebResponse WebResponse = Request.GetResponse() as HttpWebResponse)
                 {
+                    respStatusCode = WebResponse.StatusCode;
                     using (Stream ResponseStream = WebResponse.GetResponseStream())
                     {
                         StreamReader Reader = new StreamReader(ResponseStream, Encoding.UTF8);
                         Response = Reader.ReadToEnd();
                         return Response;
                     }
+                    
                 }
             }
             catch (Exception e)

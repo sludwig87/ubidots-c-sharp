@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Net;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -63,16 +64,16 @@ namespace Ubidots
         /// Send a value to Ubidots API and save it.
         /// </summary>
         /// <param name="Value">The value to be saved</param>
-        public void SaveValue(int Value)
+        public HttpStatusCode SaveValue(int Value)
         {
-            SaveValue((double)Value);
+            return SaveValue((double)Value);
         }
 
         /// <summary>
         /// Send a value to Ubidots API and save it.
         /// </summary>
         /// <param name="Value">The value to be saved</param>
-        public void SaveValue(double Value)
+        public HttpStatusCode SaveValue(double Value)
         {
             Dictionary<string, object> Data = new Dictionary<string, object>();
             Data.Add("value", Value);
@@ -80,7 +81,8 @@ namespace Ubidots
 
             string Json = JsonConvert.SerializeObject(Data);
 
-            Bridge.Post("variables/" + GetId() + "/values", Json);
+            Bridge.PostResp("variables/" + GetId() + "/values", Json, out HttpStatusCode status);
+            return status;
         }
 
         /// <summary>
@@ -88,9 +90,9 @@ namespace Ubidots
         /// </summary>
         /// <param name="Value">The value to be saved</param>
         /// <param name="Context">The context to be saved</param>
-        public void SaveValue(int Value, Dictionary<string, object> Context)
+        public string SaveValue(int Value, Dictionary<string, object> Context)
         {
-            SaveValue((double)Value, Context);
+            return SaveValue((double)Value, Context);
         }
 
         /// <summary>
@@ -98,7 +100,7 @@ namespace Ubidots
         /// </summary>
         /// <param name="Value">The value to be saved</param>
         /// <param name="Context">The context to be saved</param>
-        public void SaveValue(double Value, Dictionary<string, object> Context)
+        public string SaveValue(double Value, Dictionary<string, object> Context)
         {
             Dictionary<string, object> Data = new Dictionary<string, object>();
             Data.Add("value", Value);
@@ -107,7 +109,7 @@ namespace Ubidots
 
             string Json = JsonConvert.SerializeObject(Data);
 
-            Bridge.Post("variables/" + GetId() + "/values", Json);
+            return Bridge.Post("variables/" + GetId() + "/values", Json);
         }
 
         /// <summary>
@@ -159,7 +161,9 @@ namespace Ubidots
 
             string Json = JsonConvert.SerializeObject(ValuesList);
 
-            Bridge.Post("variables/" + GetId() + "/values", Json);
+            string res = Bridge.Post("variables/" + GetId() + "/values", Json);
+
+
         }
 
         /// <summary>
